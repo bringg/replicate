@@ -34,8 +34,8 @@ Gem::Specification.new do |s|
 
   s.executables = ['replicate']
   s.test_files = s.files.select {|path| path =~ /^test\/.*_test.rb/}
-  s.add_development_dependency 'activerecord', '~> 5.1'
-  s.add_development_dependency 'sqlite3', '~> 1.3.6'
+  s.add_development_dependency 'activerecord', '~> 6.0'
+  s.add_development_dependency 'sqlite3', '~> 1.4.2'
   s.add_development_dependency 'rake'
   s.add_development_dependency 'minitest'
   s.add_development_dependency 'minitest-around'
