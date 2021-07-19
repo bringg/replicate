@@ -220,7 +220,7 @@ module Replicate
 
       # Set flag for replicating original id.
       def replicate_id=(boolean)
-        self.replicate_natural_key = [:id] if boolean
+        self.replicate_natural_key = [self.primary_key.to_sym] if boolean
         @replicate_id = boolean
       end
 
@@ -284,7 +284,7 @@ module Replicate
         replicate_disable_callbacks instance
         instance.save :validate => false
 
-        [instance.id, instance]
+        [instance.send(instance.class.primary_key), instance]
       end
 
       # Disable all callbacks on an ActiveRecord::Base instance. Only the
