@@ -52,12 +52,17 @@ module Replicate
     # Read multiple [type, id, attrs] replicant tuples from io and call the
     # feed method to load and filter the object.
     def read(io)
-      begin
-        while object = Marshal.load(io)
-          type, id, attrs = object
-          feed type, id, attrs
+      ActiveRecord::Base.transaction do
+        begin
+          if ActiveRecord::Base.connection.instance_values["config"][:adapter] == "postgresql"
+            ActiveRecord::Base.connection.execute("set constraints all deferred")
+          end
+          while object = Marshal.load(io)
+            type, id, attrs = object
+            feed type, id, attrs
+          end
+        rescue EOFError
         end
-      rescue EOFError
       end
     end
 
