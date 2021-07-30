@@ -22,8 +22,8 @@ module Replicate
         @replicate_opts = opts
         @replicate_opts[:associations] ||= []
         @replicate_opts[:omit] ||= []
-        dump_all_association_replicants dumper, :belongs_to
         dumper.write self.class.to_s, id, replicant_attributes, self
+        dump_all_association_replicants dumper, :belongs_to
         dump_all_association_replicants dumper, :has_one
         included_associations.each do |association|
           dump_association_replicants dumper, association

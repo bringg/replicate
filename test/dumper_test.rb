@@ -44,6 +44,23 @@ class DumperTest < Minitest::Test
     assert called
   end
 
+  def test_never_dumps_objects_more_than_once_for_root_class
+    called = false
+    object = thing('name' => 'thing', 'test' => 'value1')
+    object2 = thing('name' => 'thing', 'test' => 'value2')
+    @dumper = Replicate::Dumper.new(nil, Replicate::Object)
+    @dumper.listen do |type, id, attrs, obj|
+      assert !called
+      called = true
+    end
+
+    @dumper.dump object
+    @dumper.dump object
+    @dumper.dump object
+    @dumper.dump object2
+    assert called
+  end
+
   # This test currently fails. It's been a long time since anybody
   # worked on this library and I'm not sure if it's just because of
   # a Ruby update or what. In any event I'm just going to comment it out
