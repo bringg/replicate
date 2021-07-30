@@ -19,7 +19,7 @@ module Replicate
     # Create a new Dumper.
     #
     # io          - IO object to write marshalled replicant objects to.
-    # root_class  - dump only one item of root class.
+    # root_class  - Dump only one item of root class.
     # block       - Dump context block. If given, the end of the block's execution
     #          is assumed to be the end of the dump stream.
     def initialize(io=nil, root_class=nil)
