@@ -19,6 +19,7 @@ ActiveRecord::Schema.define do
     t.string   "login"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer "user_id"
   end
 
   create_table "profiles", :force => true do |t|
@@ -54,6 +55,7 @@ end
 
 # models
 class User < ActiveRecord::Base
+  belongs_to :user
   has_one  :profile, :dependent => :destroy
   has_many :emails,  -> { order('id') }, :dependent => :destroy
   has_many :notes,   :as => :notable
@@ -119,6 +121,7 @@ class ActiveRecordTest < Minitest::Test
     user.emails.create! :email => 'kyle@github.com'
 
     user = User.create! :login => 'tmm1'
+    user.update(user: user)
     user.create_profile :name => 'tmm1', :homepage => 'https://github.com/tmm1'
 
     github = Domain.create! :host => 'github.com'
@@ -140,17 +143,18 @@ class ActiveRecordTest < Minitest::Test
     assert_equal 2, objects.size
 
     type, id, attrs, obj = objects.shift
+    assert_equal 'Profile', type
+    assert_equal rtomayko.profile.id, id
+    assert_equal 'Ryan Tomayko', attrs['name']
+    assert_equal rtomayko.profile, obj
+
+    type, id, attrs, obj = objects.shift
     assert_equal 'User', type
     assert_equal rtomayko.id, id
     assert_equal 'rtomayko', attrs['login']
     assert_equal rtomayko.created_at, attrs['created_at']
     assert_equal rtomayko, obj
 
-    type, id, attrs, obj = objects.shift
-    assert_equal 'Profile', type
-    assert_equal rtomayko.profile.id, id
-    assert_equal 'Ryan Tomayko', attrs['name']
-    assert_equal rtomayko.profile, obj
   end
 
   def test_omit_dumping_of_attribute
@@ -237,18 +241,19 @@ class ActiveRecordTest < Minitest::Test
     assert_equal 3, objects.size
 
     type, id, attrs, obj = objects.shift
+    assert_equal 'Note', type
+    assert_equal note.id, id
+    assert_equal note.notable_type, attrs['notable_type']
+    assert_equal attrs["notable_id"], [:id, 'User', rtomayko.id]
+    assert_equal note, obj
+
+    type, id, attrs, obj = objects.shift
     assert_equal 'User', type
     assert_equal rtomayko.id, id
 
     type, id, attrs, obj = objects.shift
     assert_equal 'Profile', type
 
-    type, id, attrs, obj = objects.shift
-    assert_equal 'Note', type
-    assert_equal note.id, id
-    assert_equal note.notable_type, attrs['notable_type']
-    assert_equal attrs["notable_id"], [:id, 'User', rtomayko.id]
-    assert_equal note, obj
   end
 
   def test_dumping_has_many_associations
@@ -395,12 +400,12 @@ class ActiveRecordTest < Minitest::Test
     @dumper.dump note
 
     assert_equal 2, objects.size
+    type, id, attrs, obj = objects.shift
+    assert_equal 'Note', type
 
     type, id, attrs, obj = objects.shift
     assert_equal 'User::Namespaced', type
 
-    type, id, attrs, obj = objects.shift
-    assert_equal 'Note', type
   end
 
   def test_skips_belongs_to_information_if_omitted
