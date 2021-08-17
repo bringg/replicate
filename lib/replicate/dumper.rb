@@ -18,13 +18,11 @@ module Replicate
   class Dumper < Emitter
     # Create a new Dumper.
     #
-    # io          - IO object to write marshalled replicant objects to.
-    # root_class  - Dump only one item of root class.
-    # block       - Dump context block. If given, the end of the block's execution
+    # io     - IO object to write marshalled replicant objects to.
+    # block  - Dump context block. If given, the end of the block's execution
     #          is assumed to be the end of the dump stream.
-    def initialize(io=nil, root_class=nil)
+    def initialize(io=nil)
       @memo = Hash.new { |hash,k| hash[k] = {} }
-      @root_class = root_class.name if root_class.present?
       super() do
         marshal_to io if io
         yield self if block_given?
@@ -101,7 +99,6 @@ module Replicate
       else
         return false
       end
-      return true if (type.to_s == @root_class) && (@memo[type.to_s].present?)
       @memo[type.to_s][id]
     end
 
