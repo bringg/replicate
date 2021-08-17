@@ -585,9 +585,5 @@ class ActiveRecordTest < Minitest::Test
     user = User.find(user.id)
     assert_equal timestamp, user.updated_at
   end
-
-  def test_enabling_active_record_query_cache
-    ActiveRecord::Base.connection.enable_query_cache!
-    ActiveRecord::Base.connection.disable_query_cache!
-  end
+  
 end
